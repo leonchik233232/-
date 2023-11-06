@@ -69,3 +69,7 @@ def find_arbitrage_pairs(markets):
                         linked_pairs.append((pair1_market, pair2_market, pair3_market))
 
     return linked_pairs
+# Вызов функции find_arbitrage_pairs и вывод результатов
+result = find_arbitrage_pairs(markets)
+for pair in result:
+    print(pair)
