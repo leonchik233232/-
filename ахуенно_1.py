@@ -55,23 +55,17 @@ def find_arbitrage_pairs(markets):
                         ticker2 = exchange.fetch_ticker(pair2_market)
                         ticker3 = exchange.fetch_ticker(pair3_market)
 
-                        print(f"Pair 1 ({pair1_market}): {ticker1['ask']}")
-                        print(f"Pair 2 ({pair2_market}): {ticker2['ask']}")
-                        print(f"Pair 3 ({pair3_market}): {ticker3['bid']}")
+                        pair1_ask_price = ticker1['ask']
+                        pair2_ask_price = ticker2['ask']
+                        pair3_bid_price = ticker3['bid']
+
+                        
+
+                        profit_percentage_1 = (pair3_bid_price - pair1_ask_price) / pair1_ask_price * 100
+                        profit_percentage = profit_percentage_1 + 100
+                        print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
                         print("-------------------")
 
-                        linked_pairs.append(
-                            (pair1_market, pair2_market, pair3_market))
+                        linked_pairs.append((pair1_market, pair2_market, pair3_market))
 
     return linked_pairs
-
-
-
-
-# Вызов функции find_arbitrage_pairs и вывод результатов
-result = find_arbitrage_pairs(markets)
-for pair in result:
-    print(pair)
-
-
-time.sleep(100)
