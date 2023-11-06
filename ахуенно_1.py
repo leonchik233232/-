@@ -3,13 +3,6 @@ import datetime
 import time
 import requests
 
-def calculate_profit_percentage(pair1_ask_price, pair2_ask_price, pair3_bid_price, fee):
-    bought_amount = 1 / pair1_ask_price
-    sold_amount = bought_amount * pair2_ask_price
-    final_amount = sold_amount * pair3_bid_price
-
-    profit_percentage = (final_amount - 1) * 100
-
 def sync_time_with_ntp():
     ntp_server = 'http://worldtimeapi.org/api/timezone/UTC'
     response = requests.get(ntp_server)
