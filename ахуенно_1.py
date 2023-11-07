@@ -2,6 +2,8 @@ import ccxt
 import datetime
 import time
 import requests
+from telegram.ext import Updater, CommandHandler
+
 
 def sync_time_with_ntp():
     ntp_server = 'http://worldtimeapi.org/api/timezone/UTC'
@@ -53,15 +55,17 @@ def find_arbitrage_pairs(markets):
                         pair3_bid_price = ticker3['bid']
 
                         
+                        if pair1_ask_price is not None and pair3_bid_price is not None:
+                            profit_percentage = ((pair3_bid_price / pair1_ask_price) - 1) / 100
+                            
 
-                        profit_percentage_1 = (pair3_bid_price - pair1_ask_price) / pair1_ask_price * 100
-                        profit_percentage = profit_percentage_1 + 100
-                        print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
-                        print("-------------------")
+                            print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
+                            print("-------------------")
 
-                        linked_pairs.append((pair1_market, pair2_market, pair3_market))
+                            linked_pairs.append((pair1_market, pair2_market, pair3_market))
 
     return linked_pairs
+
 # Вызов функции find_arbitrage_pairs и вывод результатов
 result = find_arbitrage_pairs(markets)
 for pair in result:
