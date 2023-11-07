@@ -57,12 +57,12 @@ def find_arbitrage_pairs(markets):
                         
                         if pair1_ask_price is not None and pair3_bid_price is not None:
                             profit_percentage = ((pair3_bid_price / pair1_ask_price) - 1) / 100
-                            
+                            profit_percentage = round(profit_percentage, 2) # Округление до 2 знаков после запятой
+                            if 1 <= profit_percentage <= 10:
+                                print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
+                                print("-------------------")
 
-                            print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
-                            print("-------------------")
-
-                            linked_pairs.append((pair1_market, pair2_market, pair3_market))
+                                linked_pairs.append((pair1_market, pair2_market, pair3_market))
 
     return linked_pairs
 
