@@ -2,8 +2,8 @@ import ccxt
 import datetime
 import time
 import requests
-from telegram.ext import Updater, CommandHandler
-
+from colorama import init, Fore
+init()
 
 def sync_time_with_ntp():
     ntp_server = 'http://worldtimeapi.org/api/timezone/UTC'
@@ -49,19 +49,27 @@ def find_arbitrage_pairs(markets):
                         ticker1 = exchange.fetch_ticker(pair1_market)
                         ticker2 = exchange.fetch_ticker(pair2_market)
                         ticker3 = exchange.fetch_ticker(pair3_market)
-
-                        pair1_ask_price = ticker1['ask']
-                        pair2_ask_price = ticker2['ask']
-                        pair3_bid_price = ticker3['bid']
-
                         
-                        if pair1_ask_price is not None and pair3_bid_price is not None:
-                            profit_percentage = ((pair3_bid_price / pair1_ask_price) - 1) / 100
+                        pair1_buy_price = ticker1['bid']
+                        pair2_buy_price = ticker2['bid']
+                        pair3_sell_price = ticker3['ask']
+                        
+                        pair1_market_1 = pair1_market.replace('/', '_')
+                        pair2_market_2 = pair2_market.replace('/', '_')
+                        pair3_market_3 = pair3_market.replace('/', '_')
+                        if pair1_buy_price is not None and pair2_buy_price is not None and pair3_sell_price is not None:
+                            profit_percentage = ((pair3_sell_price / pair1_buy_price) - 1) / 100
                             profit_percentage = round(profit_percentage, 2) # Округление до 2 знаков после запятой
-                            if 1 <= profit_percentage <= 10:
-                                print(f"Pair 1: {pair1_market} \nPair 2: {pair2_market} \nPair 3: {pair3_market} \nProfit: {profit_percentage}%")
-                                print("-------------------")
+                            if 1 <= float(profit_percentage) <= 100:
+                                pair1_url = f"https://www.binance.com/ru/trade/{pair1_market_1}?_from=markets"
+                                pair2_url = f"https://www.binance.com/ru/trade/{pair2_market_2}?_from=markets"
+                                pair3_url = f"https://www.binance.com/ru/trade/{pair3_market_3}?_from=markets"
 
+                                print(f"Pair 1: {Fore.BLUE} {pair1_market} {Fore.RESET},    Buy Price:  {Fore.GREEN}{pair1_buy_price}{Fore.RESET}\n{pair1_url}")
+                                print(f"Pair 2: {Fore.BLUE} {pair2_market} {Fore.RESET},     Buy Price:  {Fore.GREEN}{pair2_buy_price}{Fore.RESET}\n{pair2_url}")
+                                print(f"Pair 3: {Fore.BLUE} {pair3_market} {Fore.RESET},    Sell Price:  {Fore.RED}{pair3_sell_price}{Fore.RESET}\n{pair3_url}")
+                                print(f"Profit:  {profit_percentage}%")
+                                print("-------------------")
                                 linked_pairs.append((pair1_market, pair2_market, pair3_market))
 
     return linked_pairs
