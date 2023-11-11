@@ -4,20 +4,6 @@ import time
 import requests
 from colorama import init, Fore
 init()
-
-def sync_time_with_ntp():
-    ntp_server = 'http://worldtimeapi.org/api/timezone/UTC'
-    response = requests.get(ntp_server)
-    server_time = response.json()['unixtime']
-    current_time = time.time()
-    time_difference = server_time - current_time
-    time_offset = datetime.timedelta(seconds=time_difference)
-    datetime.datetime.now() + time_offset
-
-# Вызов функции для синхронизации времени
-    return sync_time_with_ntp()
-
-
 exchange = ccxt.binance({
     'apiKey': 'y9ZZxXpHnEXXFsMHzoDZAvonb5A8BpSxV8XD2E9eYP5ifreb1CXfHLMBLpeDicJV',
     'secret': 'kYn13lJCWszMlhU4HkJuDu87hxFiuotllKo42ZDZiHP7VRXmaEH4B9BPEBeMhlRH',
