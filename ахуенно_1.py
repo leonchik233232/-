@@ -44,7 +44,8 @@ def find_arbitrage_pairs(markets):
                         pair2_market_2 = pair2_market.replace('/', '_')
                         pair3_market_3 = pair3_market.replace('/', '_')
                         if pair1_buy_price is not None and pair2_buy_price is not None and pair3_sell_price is not None:
-                            profit_percentage = ((pair3_sell_price / pair1_buy_price) - 1) / 100
+                            profit = (pair3_sell_price / pair2_buy_price) - 1
+                            profit_percentage = profit * 100
                             profit_percentage = round(profit_percentage, 2) # Округление до 2 знаков после запятой
                             if 1 <= float(profit_percentage) <= 100:
                                 pair1_url = f"https://www.binance.com/ru/trade/{pair1_market_1}?_from=markets"
