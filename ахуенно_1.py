@@ -1,17 +1,16 @@
 import ccxt
-import datetime
-import time
-import requests
 from colorama import init, Fore
-init()
+import time
+from datetime import datetime
+
 exchange = ccxt.binance({
-    'apiKey': 'y9ZZxXpHnEXXFsMHzoDZAvonb5A8BpSxV8XD2E9eYP5ifreb1CXfHLMBLpeDicJV',
-    'secret': 'kYn13lJCWszMlhU4HkJuDu87hxFiuotllKo42ZDZiHP7VRXmaEH4B9BPEBeMhlRH',
+'apiKey': 'y9ZZxXpHnEXXFsMHzoDZAvonb5A8BpSxV8XD2E9eYP5ifreb1CXfHLMBLpeDicJV',
+'secret': 'kYn13lJCWszMlhU4HkJuDu87hxFiuotllKo42ZDZiHP7VRXmaEH4B9BPEBeMhlRH'
 })
 
+init()
+
 markets = exchange.fetch_markets()
-
-
 def find_arbitrage_pairs(markets):
     linked_pairs = []
 
@@ -32,25 +31,18 @@ def find_arbitrage_pairs(markets):
                     quote3, base3 = pair3_market.split('/')
 
                     if base3 == base2 and quote3 == 'USDT':
-                        ticker1 = exchange.fetch_ticker(pair1_market)
-                        ticker2 = exchange.fetch_ticker(pair2_market)
-                        ticker3 = exchange.fetch_ticker(pair3_market)
+                        pair1_buy_price = exchange.fetch_ticker(pair1_market)['bid']
+                        pair2_buy_price = exchange.fetch_ticker(pair2_market)['bid']
+                        pair3_sell_price = exchange.fetch_ticker(pair3_market)['ask']
                         
-                        pair1_buy_price = ticker1['bid']
-                        pair2_buy_price = ticker2['bid']
-                        pair3_sell_price = ticker3['ask']
-                        
-                        pair1_market_1 = pair1_market.replace('/', '_')
-                        pair2_market_2 = pair2_market.replace('/', '_')
-                        pair3_market_3 = pair3_market.replace('/', '_')
                         if pair1_buy_price is not None and pair2_buy_price is not None and pair3_sell_price is not None:
-                            profit = (pair3_sell_price / pair2_buy_price) - 1
-                            profit_percentage = profit * 100
-                            profit_percentage = round(profit_percentage, 2) # Округление до 2 знаков после запятой
-                            if 1 <= float(profit_percentage) <= 100:
-                                pair1_url = f"https://www.binance.com/ru/trade/{pair1_market_1}?_from=markets"
-                                pair2_url = f"https://www.binance.com/ru/trade/{pair2_market_2}?_from=markets"
-                                pair3_url = f"https://www.binance.com/ru/trade/{pair3_market_3}?_from=markets"
+                            profit_percentage = ((pair1_buy_price * pair2_buy_price * pair3_sell_price) - 1) * 100
+                            profit_percentage = round(profit_percentage, 2)
+
+                            if profit_percentage > 0: # Исправлено: проверка на прибыльность
+                                pair1_url = f"https://www.binance.com/ru/trade/{pair1_market.replace('/', '_')}?_from=markets"
+                                pair2_url = f"https://www.binance.com/ru/trade/{pair2_market.replace('/', '_')}?_from=markets"
+                                pair3_url = f"https://www.binance.com/ru/trade/{pair3_market.replace('/', '_')}?_from=markets"
 
                                 print(f"Pair 1: {Fore.BLUE} {pair1_market} {Fore.RESET},    Buy Price:  {Fore.GREEN}{pair1_buy_price}{Fore.RESET}\n{pair1_url}")
                                 print(f"Pair 2: {Fore.BLUE} {pair2_market} {Fore.RESET},     Buy Price:  {Fore.GREEN}{pair2_buy_price}{Fore.RESET}\n{pair2_url}")
@@ -61,7 +53,21 @@ def find_arbitrage_pairs(markets):
 
     return linked_pairs
 
-# Вызов функции find_arbitrage_pairs и вывод результатов
-result = find_arbitrage_pairs(markets)
-for pair in result:
-    print(pair)
+
+
+def main():
+    server_time = exchange.fetch_time()
+    local_time = datetime.now().timestamp() * 1000
+    time_diff = int(local_time - server_time)
+    exchange.options = {
+        'adjustForTimeDifference': True,
+        'timestamp': time_diff
+    }
+
+    result = find_arbitrage_pairs(markets)
+    for pair in result:
+        print(pair)
+
+if __name__ == "__main__":
+    main()
+
